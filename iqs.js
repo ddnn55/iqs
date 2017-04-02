@@ -14,6 +14,13 @@ superagent.get(url).end(function(err, response) {
 
 	const $ = cheerio.load(response.text);
 	
-	console.log($(selector).html());
+	$(selector).each(function(e, element) {
+		if(argv.attribute) {
+			console.log($(this).attr(argv.attribute));
+		}
+		else {
+			console.log($.html(this));
+		}
+	});
 });
 
