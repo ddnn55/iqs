@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "querySelector() the web from the command line",
   "main": "iqs.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "bin": "./iqs.js",
   "author": "David Stolarsky",
   "dependencies": {
     "cheerio": "^0.22.0",
