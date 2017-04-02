@@ -1,0 +1,15 @@
+{
+  "name": "iqs",
+  "version": "1.0.0",
+  "description": "querySelector() the web from the command line",
+  "main": "iqs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Stolarsky",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "superagent": "^3.5.2",
+    "yargs": "^7.0.2"
+  }
+}
