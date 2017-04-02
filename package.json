@@ -1,6 +1,6 @@
 {
   "name": "iqs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "querySelector() the web from the command line",
   "main": "iqs.js",
   "bin": "./iqs.js",
