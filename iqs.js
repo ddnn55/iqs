@@ -16,10 +16,17 @@ while(nextArg < columnsExtractorArgs.length) {
 	let extractor = {
 		selector: columnsExtractorArgs [nextArg++]
 	};
-	// '@' for attribute is like XPath
-	if(nextArg < columnsExtractorArgs.length && columnsExtractorArgs[nextArg].substring(0, 1) === '@') {
-		extractor.attribute = columnsExtractorArgs[nextArg++].substring(1);
+
+	if(nextArg < columnsExtractorArgs.length) {
+		// '@' for attribute is like XPath
+		if(columnsExtractorArgs[nextArg].substring(0, 1) === '@') {
+			extractor.attribute = columnsExtractorArgs[nextArg++].substring(1);
+		}
+		else if(columnsExtractorArgs[nextArg] === 'text') {
+			extractor.text = true;
+		}
 	}
+
 	extractors.push(extractor);
 }
 
@@ -42,18 +49,26 @@ superagent.get(url).end(function(err, response) {
 	const rowElements = $(rowsSelector);
 
 	$(rowsSelector).each(function(rowIndex, rowElement) {
-		const cells = extractors.map(function(extractor, extractorIndex) {
-			const columnElement = $(rowElement).find(extractor.selector);
-			//rows[elementIndex] = rows[elementIndex] || [];
-			if(extractor.attribute) {
-				return columnElement.attr(extractor.attribute);
-			}
-			else {
-				return $.html(columnElement);
-			}
-		});
+		if(extractors.length === 0) {
+			console.log($.html(rowElement));
+		}
+		else {
+			const cells = extractors.map(function(extractor, extractorIndex) {
+				const columnElement = $(rowElement).find(extractor.selector);
+				//rows[elementIndex] = rows[elementIndex] || [];
+				if(extractor.attribute) {
+					return columnElement.attr(extractor.attribute);
+				}
+				else if(extractor.text) {
+					return columnElement.text();
+				}
+				else {
+					return $.html(columnElement);
+				}
+			});
+			console.log(formatRow(cells));
+		}
 		
-		console.log(formatRow(cells));
 	});
 	
 
