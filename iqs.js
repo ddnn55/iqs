@@ -2,10 +2,35 @@
 
 const superagent = require('superagent'),
       argv = require('yargs').argv,
-      cheerio = require('cheerio');
+      cheerio = require('cheerio'),
+      util = require('util'),
+      _ = require('lodash');
 
 const url = argv._[0],
-      selector = argv._.slice(1).join(' ');
+      rowsSelector = argv._[1],
+      columnsExtractorArgs = argv._.slice(2);
+
+let extractors = [];
+let nextArg = 0;
+while(nextArg < columnsExtractorArgs.length) {
+	let extractor = {
+		selector: columnsExtractorArgs [nextArg++]
+	};
+	// '@' for attribute is like XPath
+	if(nextArg < columnsExtractorArgs.length && columnsExtractorArgs[nextArg].substring(0, 1) === '@') {
+		extractor.attribute = columnsExtractorArgs[nextArg++].substring(1);
+	}
+	extractors.push(extractor);
+}
+
+
+const formatRow = argv.format ?
+	function(columns) {
+		return util.format.apply(util.format, [argv.format].concat(columns));
+	} :
+	function(columns) {
+		return JSON.stringify(columns);
+	};
 
 superagent.get(url).end(function(err, response) {
 	if(err) {
@@ -14,13 +39,26 @@ superagent.get(url).end(function(err, response) {
 
 	const $ = cheerio.load(response.text);
 	
-	$(selector).each(function(e, element) {
-		if(argv.attribute) {
-			console.log($(this).attr(argv.attribute));
-		}
-		else {
-			console.log($.html(this));
-		}
+	const rowElements = $(rowsSelector);
+
+	$(rowsSelector).each(function(rowIndex, rowElement) {
+		const cells = extractors.map(function(extractor, extractorIndex) {
+			const columnElement = $(rowElement).find(extractor.selector);
+			//rows[elementIndex] = rows[elementIndex] || [];
+			if(extractor.attribute) {
+				return columnElement.attr(extractor.attribute);
+			}
+			else {
+				return $.html(columnElement);
+			}
+		});
+		
+		console.log(formatRow(cells));
 	});
+	
+
+	//rows.forEach(function(row) {
+	//	console.log(util.format.apply(util.format, [format].concat(row)));
+	//});
 });
 
